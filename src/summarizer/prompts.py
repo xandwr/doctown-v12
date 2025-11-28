@@ -58,12 +58,14 @@ Guidelines:
 """
 
 SYSTEM_STRUCTURED_OUTPUT = """
-When asked to output structured data:
-- Follow the provided JSON schema exactly.
-- Output only valid JSON.
-- No commentary, explanation, or narration.
-- No markdown.
-- No trailing commas.
+You are a code/document analyzer that extracts factual information into structured JSON.
+
+CRITICAL RULES:
+- Extract REAL identifiers, names, and text from the input - never invent or hallucinate
+- Output ONLY valid JSON matching the schema - no explanation, markdown, or commentary
+- Use empty lists [] or null for fields with insufficient evidence
+- NEVER echo task instructions back as field values
+- File paths are strong hints for module/package names
 """
 
 
@@ -175,38 +177,44 @@ def make_structured_cluster_prompt(
     Returns:
         Formatted prompt string
     """
-    joined = "\n\n---\n\n".join(chunks)
-
-    # Build file paths section if provided
+    # Build file paths section - CRITICAL for grounding small models
     paths_section = ""
     if file_paths:
-        paths_list = "\n".join(f"- {p}" for p in file_paths)
+        paths_list = "\n".join(f"  • {p}" for p in sorted(file_paths))
         paths_section = f"""
-Source files in this cluster:
+═══ SOURCE FILES ═══
 {paths_list}
+
 """
 
-    return f"""
-Analyze this cluster of related text.
+    # Format chunks with clear visual boundaries
+    formatted_chunks = []
+    for i, chunk in enumerate(chunks):
+        formatted_chunks.append(f"── Chunk {i+1} ──\n{chunk}")
+    joined = "\n\n".join(formatted_chunks)
 
-Cluster ID: {cluster_id}
-Number of chunks: {len(chunks)}
-{paths_section}
-IMPORTANT: If you have insufficient evidence for a list field, return an empty list [].
-Do not invent or hallucinate values. Empty lists are preferred over guesses.
+    return f"""Extract information from this code/documentation cluster.
 
-Return findings in the exact JSON structure specified by the user.
+{paths_section}═══ CONTENT ({len(chunks)} chunks) ═══
 
-Cluster contents:
---------------------
 {joined}
---------------------
 
-JSON schema:
+═══ END CONTENT ═══
+
+EXTRACTION TASK:
+Analyze the content above and fill the JSON schema. Follow these rules:
+
+1. EXTRACT REAL DATA: Copy actual function names, class names, imports, and identifiers verbatim from the code
+2. USE FILE PATHS: Infer module/package names from paths (e.g., "src/auth/login.py" → module is "auth.login")
+3. FIND DEPENDENCIES: List real imports you see (e.g., "import pandas", "from fastapi import", "use tokio::")
+4. SUMMARIZE FROM TEXT: For description fields, paraphrase what the code does based on comments, docstrings, or logic
+5. EMPTY IS OK: Use [] for lists and null for optional fields if no evidence exists
+6. DO NOT ECHO INSTRUCTIONS: Never put task instructions or schema field names as values
+
+SCHEMA TO FILL:
 {schema}
 
-Output must be strictly valid JSON.
-"""
+Respond with valid JSON only."""
 
 
 def make_structured_project_prompt(
@@ -229,36 +237,34 @@ def make_structured_project_prompt(
     Returns:
         Formatted prompt string
     """
-    return f"""
-Generate a project-level summary by synthesizing cluster summaries and metrics.
+    return f"""Synthesize a project-level summary from these cluster analyses.
 
-CLUSTER SUMMARIES:
---------------------
+═══ CLUSTER SUMMARIES ═══
 {cluster_summaries}
---------------------
 
+═══ METRICS ═══
 {metrics}
 
-REPRESENTATIVE SAMPLES:
---------------------
+═══ SAMPLE CODE/TEXT ═══
 {representative_samples}
---------------------
 
-Your task:
-- Synthesize the cluster summaries into a coherent project-level view
-- Incorporate the metrics where relevant
-- Use representative samples for additional context
-- Stay grounded in the provided information
-- Output strictly according to the JSON schema below
+═══ END INPUT ═══
 
-IMPORTANT: If you have insufficient evidence for a list field, return an empty list [].
-Do not invent or hallucinate values. Empty lists are preferred over guesses.
+SYNTHESIS TASK:
+Create a unified project summary by combining insights from all clusters above.
 
-JSON schema:
+RULES:
+1. AGGREGATE: Combine module names, functions, and patterns found across clusters
+2. IDENTIFY THEMES: What is this project/codebase about? What problem does it solve?
+3. LIST REAL ARTIFACTS: Only include module names, entry points, and tech stack items that appear in the cluster data
+4. USE METRICS: Reference actual file counts, token counts from the metrics section
+5. EMPTY IS OK: Use [] for lists and null for optional fields if no clear evidence exists
+6. BE SPECIFIC: "Rust CLI tool for document analysis" is better than "A software project"
+
+SCHEMA TO FILL:
 {schema}
 
-Output must be strictly valid JSON.
-"""
+Respond with valid JSON only."""
 
 
 # =====================================================================

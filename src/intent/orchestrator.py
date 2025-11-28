@@ -106,13 +106,38 @@ def summarize_project(
     ProjectModel = build_model("ProjectSummary", intent.project_schema)
 
     # Prepare context for LLM
-    # 1. Cluster summaries
+    # 1. Cluster summaries - format for easy extraction by project-level model
     cluster_summaries_text = []
     for cluster in clusters:
         if cluster.summary:
-            summary_str = f"Cluster {cluster.cluster_id}:\n"
-            for key, val in cluster.summary.items():
-                summary_str += f"  {key}: {val}\n"
+            # Get file paths for this cluster
+            cluster_files = list(set(
+                c.file_path for c in chunks
+                if c.chunk_id in cluster.chunk_ids and c.file_path
+            ))
+
+            summary_str = f"─── CLUSTER {cluster.cluster_id} ───\n"
+            summary_str += f"Files: {', '.join(cluster_files[:5])}\n"  # Top 5 files
+
+            # Format key fields more prominently
+            s = cluster.summary
+            if s.get('module_name'):
+                summary_str += f"Module: {s['module_name']}\n"
+            if s.get('purpose'):
+                summary_str += f"Purpose: {s['purpose']}\n"
+            if s.get('topic'):
+                summary_str += f"Topic: {s['topic']}\n"
+            if s.get('dependencies'):
+                summary_str += f"Dependencies: {s['dependencies']}\n"
+            if s.get('important_functions'):
+                summary_str += f"Functions: {s['important_functions']}\n"
+            if s.get('key_terms'):
+                summary_str += f"Key Terms: {s['key_terms']}\n"
+            if s.get('highlights'):
+                summary_str += f"Highlights: {s['highlights']}\n"
+            if s.get('long'):
+                summary_str += f"Summary: {s['long']}\n"
+
             cluster_summaries_text.append(summary_str)
 
     combined_clusters = "\n\n".join(cluster_summaries_text)
