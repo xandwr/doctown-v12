@@ -157,7 +157,12 @@ Output only valid JSON following the schema.
 """
 
 
-def make_structured_cluster_prompt(cluster_id: int, chunks: list[str], schema: dict) -> str:
+def make_structured_cluster_prompt(
+    cluster_id: int,
+    chunks: list[str],
+    schema: dict,
+    file_paths: list[str] | None = None
+) -> str:
     """
     Generate a prompt for structured cluster summarization.
 
@@ -165,16 +170,30 @@ def make_structured_cluster_prompt(cluster_id: int, chunks: list[str], schema: d
         cluster_id: ID of the cluster being summarized
         chunks: List of text chunks in this cluster
         schema: User-defined schema for output
+        file_paths: Optional list of source file paths in this cluster
 
     Returns:
         Formatted prompt string
     """
     joined = "\n\n---\n\n".join(chunks)
+
+    # Build file paths section if provided
+    paths_section = ""
+    if file_paths:
+        paths_list = "\n".join(f"- {p}" for p in file_paths)
+        paths_section = f"""
+Source files in this cluster:
+{paths_list}
+"""
+
     return f"""
 Analyze this cluster of related text.
 
 Cluster ID: {cluster_id}
 Number of chunks: {len(chunks)}
+{paths_section}
+IMPORTANT: If you have insufficient evidence for a list field, return an empty list [].
+Do not invent or hallucinate values. Empty lists are preferred over guesses.
 
 Return findings in the exact JSON structure specified by the user.
 
@@ -231,6 +250,9 @@ Your task:
 - Use representative samples for additional context
 - Stay grounded in the provided information
 - Output strictly according to the JSON schema below
+
+IMPORTANT: If you have insufficient evidence for a list field, return an empty list [].
+Do not invent or hallucinate values. Empty lists are preferred over guesses.
 
 JSON schema:
 {schema}

@@ -4,13 +4,64 @@ description: >
   No speculation or invention is permitted; all entries must be grounded in the input content.
 
 cluster_schema:
-  risk_category: str
-  identified_risks: [str]
-  likelihood: str        # e.g., low, medium, high
-  impact: str            # e.g., low, medium, high
-  mitigation_strategies: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS ═══
+  risk_category: str              # classification of the risk area (e.g., operational, financial, legal)
+  identified_risks: [str]         # specific risks explicitly mentioned in the source
+  likelihood: str                 # probability assessment: low, medium, high (grounded in text)
+  impact: str                     # severity assessment: low, medium, high (grounded in text)
+  mitigation_strategies: [str]    # countermeasures or controls mentioned in the source
+
+  # ═══ SUMMARY FIELDS ═══
+  topic: str                      # 1-sentence definition of what this risk cluster covers
+  short: str                      # short summary (~1–2 sentences)
+  long: str                       # longer, detailed summary (2–6 sentences)
+
+  # ═══ EXTRACTION FIELDS ═══
+  key_terms: [str]                # important grounded terms, extracted, not hallucinated
+  notable_mentions: [str]         # names, controls, regulations the model believes matter
+  highlights: [str]               # the most critical risk findings in the cluster
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # uncertainties, contradictions, or gaps in risk coverage
+  fuzzy_matches:
+    "*": [str]                    # user-provided keywords → semantically related matches
+
+  # ═══ TRACEABILITY ═══
+  source_refs: [int]              # indices of chunks used; guarantees traceability
+  raw_text_preview: str           # first ~200 chars of cluster text (verbatim)
+  confidence_notes: str           # model's own uncertainty + reasoning on confidence
 
 project_schema:
-  summary: str
-  overall_risk_level: str
-  critical_risks: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS (some optional - only fill if clearly present) ═══
+  overall_risk_level: str         # aggregate risk assessment across all clusters
+  critical_risks?: [str]          # highest-priority risks requiring immediate attention
+  risk_summary_matrix?:           # structured view of risks by category and severity (optional)
+    high_impact: [str]            # risks with high impact ratings
+    medium_impact: [str]          # risks with medium impact ratings
+    low_impact: [str]             # risks with low impact ratings
+
+  # ═══ OVERVIEW ═══
+  title: str                      # concise project name derived from content
+  overview: str                   # what this risk analysis covers in 2–4 sentences
+  key_components: [str]           # major risk domains or areas assessed
+
+  # ═══ EXTRACTION ═══
+  key_terms: [str]                # global glossary of important risk concepts
+  notable_mentions: [str]         # prominent controls, standards, or frameworks referenced
+  major_highlights: [str]         # most consequential risk insights from entire docpack
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # global uncertainties or gaps in risk coverage
+  fuzzy_matches:
+    "*": [str]                    # user keywords → semantically related project-wide matches
+
+  # ═══ METADATA ═══
+  dataset_summary: str            # grounded numeric summary (files, risk counts, categories)
+  methodology_notes: str          # how this risk analysis was produced (pipeline steps, models)
+  confidence_notes: str           # model-level uncertainty for global risk assessment
+  metrics:
+    file_count: int               # number of files ingested
+    chunk_count: int              # number of final chunks
+    cluster_count: int            # number of clusters chosen
+    token_count: int              # total tokens across all chunks
+    embedding_dim: int            # embedding vector dimensionality

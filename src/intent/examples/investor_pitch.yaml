@@ -4,16 +4,68 @@ description: >
   Focus on extracting problem, solution, market, and traction without inventing claims.
 
 cluster_schema:
-  section: str                     # e.g., "Problem", "Market", "Product"
-  key_points: [str]
-  evidence: [str]                  # any factual support mentioned in source
-  differentiators: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS ═══
+  section: str                    # pitch section (e.g., "Problem", "Solution", "Market", "Traction")
+  key_points: [str]               # main arguments or claims in this section
+  evidence: [str]                 # factual support mentioned in source (data, quotes, examples)
+  differentiators: [str]          # competitive advantages or unique aspects highlighted
+
+  # ═══ SUMMARY FIELDS ═══
+  topic: str                      # 1-sentence definition of what this pitch cluster covers
+  short: str                      # short summary (~1–2 sentences)
+  long: str                       # longer, detailed summary (2–6 sentences)
+
+  # ═══ EXTRACTION FIELDS ═══
+  key_terms: [str]                # important grounded terms, extracted, not hallucinated
+  notable_mentions: [str]         # investors, partners, customers the model believes matter
+  highlights: [str]               # the most compelling points in the cluster
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # unsubstantiated claims, missing data, or weak arguments
+  fuzzy_matches:
+    "*": [str]                    # user-provided keywords → semantically related matches
+
+  # ═══ TRACEABILITY ═══
+  source_refs: [int]              # indices of chunks used; guarantees traceability
+  raw_text_preview: str           # first ~200 chars of cluster text (verbatim)
+  confidence_notes: str           # model's own uncertainty + reasoning on confidence
 
 project_schema:
-  elevator_pitch: str
-  problem_statement: str
-  solution_overview: str
-  market_signals: [str]            # must appear in the text
-  traction_or_milestones: [str]    # also grounded in the source
-  competitive_edge: [str]
-  team_notes: [str]                # factual details only (background, roles)
+  # ═══ DOMAIN-SPECIFIC FIELDS (some optional - only fill if clearly present) ═══
+  elevator_pitch: str             # 1–2 sentence company/product summary
+  problem_statement: str          # the core problem being addressed
+  solution_overview: str          # how the product/service solves the problem
+  market_signals?: [str]          # market size, trends, or opportunity indicators (from text)
+  traction_or_milestones?: [str]  # achievements, metrics, or progress indicators (grounded)
+  competitive_edge?: [str]        # what sets this apart from alternatives
+  team_notes?: [str]              # factual details about team (backgrounds, roles)
+  funding_details?:               # investment information if present (optional)
+    stage: str                    # seed, Series A, etc. (if stated)
+    amount_sought: str            # funding target (if stated)
+    use_of_funds: [str]           # planned allocation (if stated)
+
+  # ═══ OVERVIEW ═══
+  title: str                      # concise company/project name derived from content
+  overview: str                   # what this pitch covers in 2–4 sentences
+  key_components: [str]           # major sections or themes in the pitch
+
+  # ═══ EXTRACTION ═══
+  key_terms: [str]                # global glossary of important business concepts
+  notable_mentions: [str]         # prominent investors, partners, or references
+  major_highlights: [str]         # most compelling insights from entire pitch deck
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # global concerns, missing information, or weak spots
+  fuzzy_matches:
+    "*": [str]                    # user keywords → semantically related project-wide matches
+
+  # ═══ METADATA ═══
+  dataset_summary: str            # grounded numeric summary (slides, sections, data points)
+  methodology_notes: str          # how this pitch analysis was produced (pipeline steps, models)
+  confidence_notes: str           # model-level uncertainty for global pitch assessment
+  metrics:
+    file_count: int               # number of files ingested
+    chunk_count: int              # number of final chunks
+    cluster_count: int            # number of clusters chosen
+    token_count: int              # total tokens across all chunks
+    embedding_dim: int            # embedding vector dimensionality

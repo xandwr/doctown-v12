@@ -4,15 +4,67 @@ description: >
   Summaries must only reflect facts explicitly contained in the text.
 
 cluster_schema:
-  clause_type: str
-  obligations: [str]
-  rights: [str]
-  risks: [str]
-  definitions: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS ═══
+  clause_type: str                # classification of clause (e.g., indemnification, termination, liability)
+  obligations: [str]              # duties or requirements imposed by this clause
+  rights: [str]                   # entitlements or permissions granted
+  risks: [str]                    # legal exposure or concerns identified in the text
+  definitions: [str]              # key terms defined within this clause or section
+
+  # ═══ SUMMARY FIELDS ═══
+  topic: str                      # 1-sentence definition of what this legal cluster covers
+  short: str                      # short summary (~1–2 sentences)
+  long: str                       # longer, detailed summary (2–6 sentences)
+
+  # ═══ EXTRACTION FIELDS ═══
+  key_terms: [str]                # important grounded legal terms, extracted, not hallucinated
+  notable_mentions: [str]         # parties, statutes, regulations the model believes matter
+  highlights: [str]               # the most significant legal provisions in the cluster
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # unclear language, potential conflicts, or missing provisions
+  fuzzy_matches:
+    "*": [str]                    # user-provided keywords → semantically related matches
+
+  # ═══ TRACEABILITY ═══
+  source_refs: [int]              # indices of chunks used; guarantees traceability
+  raw_text_preview: str           # first ~200 chars of cluster text (verbatim)
+  confidence_notes: str           # model's own uncertainty + reasoning on confidence
 
 project_schema:
-  document_overview: str
-  key_clauses: [str]
-  parties_involved: [str]
-  major_obligations: [str]
-  disclaimers: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS (some optional - only fill if clearly present) ═══
+  document_type: str              # classification of document (e.g., contract, agreement, policy)
+  parties_involved?: [str]        # entities bound by or referenced in the document
+  key_clauses?: [str]             # most significant clauses across the document
+  major_obligations?: [str]       # primary duties imposed across all parties
+  disclaimers?: [str]             # limitation of liability or warranty disclaimers
+  effective_dates?:               # temporal scope of the document (optional)
+    start_date: str               # when the document takes effect (if stated)
+    end_date: str                 # when the document expires (if stated)
+    renewal_terms: str            # auto-renewal or extension provisions (if stated)
+
+  # ═══ OVERVIEW ═══
+  title: str                      # concise document name derived from content
+  overview: str                   # what this legal document covers in 2–4 sentences
+  key_components: [str]           # major sections or articles in the document
+
+  # ═══ EXTRACTION ═══
+  key_terms: [str]                # global glossary of important legal concepts
+  notable_mentions: [str]         # prominent statutes, regulations, or standards referenced
+  major_highlights: [str]         # most consequential legal insights from entire docpack
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # global ambiguities, conflicts, or missing provisions
+  fuzzy_matches:
+    "*": [str]                    # user keywords → semantically related project-wide matches
+
+  # ═══ METADATA ═══
+  dataset_summary: str            # grounded numeric summary (files, clauses, sections)
+  methodology_notes: str          # how this legal review was produced (pipeline steps, models)
+  confidence_notes: str           # model-level uncertainty for global legal assessment
+  metrics:
+    file_count: int               # number of files ingested
+    chunk_count: int              # number of final chunks
+    cluster_count: int            # number of clusters chosen
+    token_count: int              # total tokens across all chunks
+    embedding_dim: int            # embedding vector dimensionality

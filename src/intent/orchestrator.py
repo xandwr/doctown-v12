@@ -53,15 +53,16 @@ def summarize_cluster(
     # Get schema for prompt
     schema_dict = intent.cluster_schema
 
-    # Prepare chunk texts
+    # Prepare chunk texts and extract file paths
     chunk_texts = [chunk.text for chunk in cluster_chunks]
-    combined_text = "\n\n---\n\n".join(chunk_texts)
+    file_paths = list(set(chunk.file_path for chunk in cluster_chunks if chunk.file_path))
 
-    # Build prompt
+    # Build prompt with file path context for better model grounding
     prompt = make_structured_cluster_prompt(
         cluster_id=cluster.cluster_id,
         chunks=chunk_texts,
-        schema=schema_dict
+        schema=schema_dict,
+        file_paths=file_paths
     )
 
     # Call LLM

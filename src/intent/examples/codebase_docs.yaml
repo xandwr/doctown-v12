@@ -4,14 +4,62 @@ description: >
   All details must be rooted in actual source content; no invented APIs or behaviors.
 
 cluster_schema:
-  module_name: str
-  purpose: str
-  key_components: [str]
-  dependencies: [str]
-  important_functions: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS ═══
+  module_name: str                # name of the module, package, or file grouping
+  purpose: str                    # what this module does in 1–2 sentences
+  dependencies: [str]             # imports, libraries, or other modules this depends on
+  important_functions: [str]      # key functions, methods, or classes with brief descriptions
+  code_patterns: [str]            # design patterns or idioms observed (e.g., singleton, factory)
+
+  # ═══ SUMMARY FIELDS ═══
+  topic: str                      # 1-sentence definition of what this code cluster covers
+  short: str                      # short summary (~1–2 sentences)
+  long: str                       # longer, detailed summary (2–6 sentences)
+
+  # ═══ EXTRACTION FIELDS ═══
+  key_terms: [str]                # important grounded terms, extracted, not hallucinated
+  notable_mentions: [str]         # classes, functions, constants the model believes matter
+  highlights: [str]               # the most significant implementation details in the cluster
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # unclear code, TODOs, potential bugs, or technical debt
+  fuzzy_matches:
+    "*": [str]                    # user-provided keywords → semantically related matches
+
+  # ═══ TRACEABILITY ═══
+  source_refs: [int]              # indices of chunks used; guarantees traceability
+  raw_text_preview: str           # first ~200 chars of cluster text (verbatim)
+  confidence_notes: str           # model's own uncertainty + reasoning on confidence
 
 project_schema:
-  overview: str
-  primary_modules: [str]
-  architecture_notes: [str]
-  technology_stack: [str]
+  # ═══ DOMAIN-SPECIFIC FIELDS (optional - only fill if clearly identifiable) ═══
+  primary_modules?: [str]         # top-level modules or packages in the codebase
+  architecture_notes?: [str]      # high-level architectural patterns or structure
+  technology_stack?: [str]        # languages, frameworks, and tools identified
+  entry_points?: [str]            # main files, CLI commands, or API endpoints
+
+  # ═══ OVERVIEW ═══
+  title: str                      # concise project name derived from content
+  overview: str                   # what this codebase does in 2–4 sentences
+  key_components: [str]           # major subsystems or feature areas
+
+  # ═══ EXTRACTION ═══
+  key_terms: [str]                # global glossary of important technical concepts
+  notable_mentions: [str]         # prominent libraries, APIs, or external services
+  major_highlights: [str]         # most consequential insights from entire codebase
+
+  # ═══ UNCERTAINTY & MATCHING ═══
+  ambiguities_or_red_flags: [str] # global technical debt, security concerns, or unclear areas
+  fuzzy_matches:
+    "*": [str]                    # user keywords → semantically related project-wide matches
+
+  # ═══ METADATA ═══
+  dataset_summary: str            # grounded numeric summary (files, lines, languages)
+  methodology_notes: str          # how this documentation was produced (pipeline steps, models)
+  confidence_notes: str           # model-level uncertainty for global code assessment
+  metrics:
+    file_count: int               # number of files ingested
+    chunk_count: int              # number of final chunks
+    cluster_count: int            # number of clusters chosen
+    token_count: int              # total tokens across all chunks
+    embedding_dim: int            # embedding vector dimensionality

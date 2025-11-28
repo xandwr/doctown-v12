@@ -6,7 +6,7 @@ structured LLM output validation.
 """
 
 from pydantic import BaseModel, create_model, Field
-from typing import Any, Dict, Type, get_origin, get_args
+from typing import Any, Dict, Optional, Type, get_origin, get_args
 
 
 def infer_type(value: Any) -> Type:
@@ -61,6 +61,10 @@ def build_model(name: str, fields: Dict[str, Any]) -> Type[BaseModel]:
     """
     Build a Pydantic model from a schema dictionary.
 
+    Supports optional fields using '?' suffix syntax:
+        - "field: str"   -> required string field
+        - "field?: str"  -> optional string field (can be null/omitted)
+
     Args:
         name: Name for the generated model
         fields: Dictionary mapping field names to type specifications
@@ -72,6 +76,7 @@ def build_model(name: str, fields: Dict[str, Any]) -> Type[BaseModel]:
         >>> schema = {
         ...     "topic": "str",
         ...     "key_terms": ["str"],
+        ...     "optional_field?": ["str"],  # Optional - can be null
         ...     "metrics": {"file_count": "int"}
         ... }
         >>> Model = build_model("SummarySchema", schema)
@@ -80,9 +85,24 @@ def build_model(name: str, fields: Dict[str, Any]) -> Type[BaseModel]:
     processed = {}
 
     for key, val in fields.items():
+        # Check for optional marker (trailing ?)
+        is_optional = key.endswith('?')
+        clean_key = key.rstrip('?') if is_optional else key
+
         field_type = infer_type(val)
-        # All fields required by default (use ...)
-        processed[key] = (field_type, Field(..., description=f"Field: {key}"))
+
+        if is_optional:
+            # Optional field: can be None, defaults to None
+            processed[clean_key] = (
+                Optional[field_type],
+                Field(default=None, description=f"Optional field: {clean_key}")
+            )
+        else:
+            # Required field
+            processed[clean_key] = (
+                field_type,
+                Field(..., description=f"Field: {clean_key}")
+            )
 
     return create_model(name, **processed)
 
