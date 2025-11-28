@@ -1,0 +1,38 @@
+name: minimal_summary        # identifier for this transform preset
+description: >               # human-readable purpose of this preset
+  Produce lightweight structured summaries for clusters and the full project.
+  Ideal for quick previews or small codebases.
+
+cluster_schema:
+  topic: str                 # 1-sentence definition of what this cluster is about
+  short: str                 # short summary (~1–2 sentences)
+  long: str                  # longer, detailed summary (2–6 sentences)
+  key_terms: [str]           # important grounded terms, extracted, not hallucinated
+  notable_mentions: [str]    # names, functions, concepts the model believes matter
+  highlights: [str]          # the most meaningful or impactful ideas in the cluster
+  ambiguities_or_red_flags: [str]   # uncertainties, contradictions, oddities
+  fuzzy_matches:
+    "*": [str]               # user-provided keywords → semantically related matches
+  source_refs: [int]         # indices of chunks used; guarantees traceability
+  raw_text_preview: str      # first ~200 chars of cluster text (verbatim)
+  confidence_notes: str      # model’s own uncertainty + reasoning on confidence
+
+project_schema:
+  title: str                 # concise project name derived from content
+  overview: str              # what this project *is* in 2–4 sentences
+  key_components: [str]      # major modules, moving pieces, or themes
+  key_terms: [str]           # global glossary of important concepts
+  notable_mentions: [str]    # prominent identifiers, names, modules
+  major_highlights: [str]    # most consequential insights from entire docpack
+  ambiguities_or_red_flags: [str]   # global uncertainties or risky areas
+  fuzzy_matches:
+    "*": [str]               # user keywords → semantically related project-wide matches
+  dataset_summary: str       # grounded numeric summary (files, types, lines)
+  methodology_notes: str     # how this docpack was produced (pipeline steps, models)
+  confidence_notes: str      # model-level uncertainty for global summary
+  metrics:
+    file_count: int          # number of files ingested
+    chunk_count: int         # number of final chunks
+    cluster_count: int       # number of clusters chosen
+    token_count: int         # total tokens across all chunks
+    embedding_dim: int       # embedding vector dimensionality

@@ -1,0 +1,18 @@
+name: legal_review
+description: >
+  Extract legally relevant points from the corpus without providing legal advice.
+  Summaries must only reflect facts explicitly contained in the text.
+
+cluster_schema:
+  clause_type: str
+  obligations: [str]
+  rights: [str]
+  risks: [str]
+  definitions: [str]
+
+project_schema:
+  document_overview: str
+  key_clauses: [str]
+  parties_involved: [str]
+  major_obligations: [str]
+  disclaimers: [str]

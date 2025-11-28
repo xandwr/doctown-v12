@@ -1,0 +1,19 @@
+name: investor_pitch
+description: >
+  Generate structured pitch materials grounded entirely in the source documents.
+  Focus on extracting problem, solution, market, and traction without inventing claims.
+
+cluster_schema:
+  section: str                     # e.g., "Problem", "Market", "Product"
+  key_points: [str]
+  evidence: [str]                  # any factual support mentioned in source
+  differentiators: [str]
+
+project_schema:
+  elevator_pitch: str
+  problem_statement: str
+  solution_overview: str
+  market_signals: [str]            # must appear in the text
+  traction_or_milestones: [str]    # also grounded in the source
+  competitive_edge: [str]
+  team_notes: [str]                # factual details only (background, roles)

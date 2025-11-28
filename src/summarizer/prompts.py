@@ -157,17 +157,80 @@ Output only valid JSON following the schema.
 """
 
 
-def make_structured_cluster_prompt(texts: list[str], schema: dict) -> str:
-    joined = "\n\n---\n\n".join(texts)
+def make_structured_cluster_prompt(cluster_id: int, chunks: list[str], schema: dict) -> str:
+    """
+    Generate a prompt for structured cluster summarization.
+
+    Args:
+        cluster_id: ID of the cluster being summarized
+        chunks: List of text chunks in this cluster
+        schema: User-defined schema for output
+
+    Returns:
+        Formatted prompt string
+    """
+    joined = "\n\n---\n\n".join(chunks)
     return f"""
 Analyze this cluster of related text.
 
+Cluster ID: {cluster_id}
+Number of chunks: {len(chunks)}
+
 Return findings in the exact JSON structure specified by the user.
 
-Cluster:
+Cluster contents:
 --------------------
 {joined}
 --------------------
+
+JSON schema:
+{schema}
+
+Output must be strictly valid JSON.
+"""
+
+
+def make_structured_project_prompt(
+    cluster_summaries: str,
+    metrics: str,
+    representative_samples: str,
+    schema: dict
+) -> str:
+    """
+    Generate a prompt for structured project-level summarization.
+
+    This is the deterministic merge: project_summary = merge(clusters + metrics + intent)
+
+    Args:
+        cluster_summaries: All cluster summaries combined
+        metrics: Dataset metrics (file count, token count, etc.)
+        representative_samples: Sample chunks from each cluster
+        schema: User-defined schema for output
+
+    Returns:
+        Formatted prompt string
+    """
+    return f"""
+Generate a project-level summary by synthesizing cluster summaries and metrics.
+
+CLUSTER SUMMARIES:
+--------------------
+{cluster_summaries}
+--------------------
+
+{metrics}
+
+REPRESENTATIVE SAMPLES:
+--------------------
+{representative_samples}
+--------------------
+
+Your task:
+- Synthesize the cluster summaries into a coherent project-level view
+- Incorporate the metrics where relevant
+- Use representative samples for additional context
+- Stay grounded in the provided information
+- Output strictly according to the JSON schema below
 
 JSON schema:
 {schema}

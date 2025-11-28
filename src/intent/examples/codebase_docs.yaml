@@ -1,0 +1,17 @@
+name: codebase_documentation
+description: >
+  Produce structured technical documentation for a software codebase.
+  All details must be rooted in actual source content; no invented APIs or behaviors.
+
+cluster_schema:
+  module_name: str
+  purpose: str
+  key_components: [str]
+  dependencies: [str]
+  important_functions: [str]
+
+project_schema:
+  overview: str
+  primary_modules: [str]
+  architecture_notes: [str]
+  technology_stack: [str]

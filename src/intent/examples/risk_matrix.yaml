@@ -1,0 +1,16 @@
+name: risk_matrix_analysis
+description: >
+  Generate a structured risk analysis matrix based solely on the supplied text.
+  No speculation or invention is permitted; all entries must be grounded in the input content.
+
+cluster_schema:
+  risk_category: str
+  identified_risks: [str]
+  likelihood: str        # e.g., low, medium, high
+  impact: str            # e.g., low, medium, high
+  mitigation_strategies: [str]
+
+project_schema:
+  summary: str
+  overall_risk_level: str
+  critical_risks: [str]

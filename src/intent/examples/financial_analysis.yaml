@@ -1,0 +1,18 @@
+name: financial_analysis
+description: >
+  Extract structured financial insights strictly from provided documents.
+  No predictions, no advice, and no interpretations beyond what the text explicitly supports.
+
+cluster_schema:
+  topic: str
+  financial_metrics: [str]         # e.g., revenue, OPEX, unit economics
+  key_figures: [str]               # numerical values mentioned in text
+  trends_described: [str]          # only if explicitly stated in the source
+  risks_or_constraints: [str]
+
+project_schema:
+  executive_summary: str
+  major_financial_drivers: [str]
+  constraints_or_risks: [str]
+  data_points: [str]               # extracted facts only
+  methodology_notes: [str]         # how the analysis was derived from the text
