@@ -23,7 +23,7 @@ def call_llm(model: str, system: str, user: str, schema: dict) -> str:
     """
     response = chat(
         model=model,
-        format=schema,                  # enforce EXACT JSON structure
+        format=schema, # enforce EXACT JSON structure
         messages=[
             {"role": "system", "content": system},
             {"role": "user",   "content": user},

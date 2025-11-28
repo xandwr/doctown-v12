@@ -65,11 +65,11 @@ def test_basic_summarization():
         print("\n" + "=" * 60)
         print("Structured Output:")
         print("=" * 60)
-        print(f"\nTheme: {result.theme}")
+        print(f"\nTheme: {result.theme}") # type: ignore
         print(f"\nKey Points:")
-        for i, point in enumerate(result.key_points, 1):
+        for i, point in enumerate(result.key_points, 1): # type: ignore
             print(f"  {i}. {point}")
-        print(f"\nSentiment: {result.sentiment}")
+        print(f"\nSentiment: {result.sentiment}") # type: ignore
 
         print("\n" + "=" * 60)
         print("Raw JSON:")
@@ -128,9 +128,9 @@ def test_custom_schema():
         print("\n" + "=" * 60)
         print("Structured Output:")
         print("=" * 60)
-        print(f"\nTopic: {result.topic}")
-        print(f"Complexity: {result.complexity}")
-        print(f"Concepts: {', '.join(result.concepts)}")
+        print(f"\nTopic: {result.topic}") # type: ignore
+        print(f"Complexity: {result.complexity}") # type: ignore
+        print(f"Concepts: {', '.join(result.concepts)}") # type: ignore
 
         print("\n" + "=" * 60)
         print("Raw JSON:")
