@@ -8,7 +8,6 @@ from pydantic import BaseModel, ValidationError
 
 from .prompts import (
     SYSTEM_SUMMARIZER,
-    JSON_INSTRUCTIONS,
     make_cluster_summary_prompt,
     make_structured_cluster_prompt,
 )
@@ -23,11 +22,10 @@ def call_llm(model: str, system: str, user: str, schema: dict) -> str:
     """
     response = chat(
         model=model,
-        format=schema, # enforce EXACT JSON structure
+        format=schema,  # enforce EXACT JSON structure
         messages=[
             {"role": "system", "content": system},
             {"role": "user",   "content": user},
-            {"role": "user",   "content": JSON_INSTRUCTIONS},
         ]
     )
 
